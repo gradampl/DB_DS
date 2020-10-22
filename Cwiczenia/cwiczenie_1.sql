@@ -43,12 +43,11 @@ CREATE TABLE Employees (
 	email varchar(255),
 	phone_number varchar(255),
 	hire_date date,
-	salary double,
-	commission_pct double,
-    manager_id int,	
+	salary float,
+	commission_pct float,    	
 	PRIMARY KEY (employee_id),
-    FOREIGN KEY (department_id) REFERENCES Departments(department_id),
-    FOREIGN KEY (manager_id) REFERENCES Employees(employee_id)	
+    CONSTRAINT fk FOREIGN KEY (department_id) REFERENCES Departments(department_id),
+    CONSTRAINT fk1 FOREIGN KEY (manager_id) REFERENCES Employees(employee_id)	
 );
 
 ALTER TABLE Departments
@@ -60,17 +59,18 @@ CREATE TABLE Job_History (
 	job_id int,
 	manager_id int,
 	start_date date,
-	end_date date    
-	PRIMARY KEY (employee_id REFERENCES Employees(employee_id), start_date),
+	end_date date,    
+	PRIMARY KEY (employee_id, start_date),
+	FOREIGN KEY (employee_id)REFERENCES Employees(employee_id),
     FOREIGN KEY (department_id) REFERENCES Departments(department_id)	
 );
 
 CREATE TABLE Jobs (
     job_id int NOT NULL,
 	job_title varchar(255),
-	min_salary double,
-    max_salary	double,
-	PRIMARY KEY (job_id),    	
+	min_salary float,
+    max_salary	float,
+	PRIMARY KEY (job_id)    	
 );
 
 ALTER TABLE Job_History
