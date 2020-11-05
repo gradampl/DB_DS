@@ -83,20 +83,6 @@ WHERE manager_id IS NOT NULL AND hire_date BETWEEN '05/01/01' AND '05/12/31'
 ORDER BY user_column;
 
 
-
-====================================================================
--- funkcja pobierająca user input
-
-accept a char prompt 'Please enter something: '
-declare 
-  a varchar2(10);
-begin
-  a := '&X';   -- for a substitution variable of char data type 
-  --dbms_output.put_line('&user_column');
-end
-
-=====================================================================
-
 CREATE VIEW zad_3 AS
 SELECT last_name||' '||first_name AS employee, salary, phone_number
 FROM employees
@@ -166,12 +152,6 @@ CREATE VIEW zad_10 AS  -- ta wersja działa
 SELECT last_name, first_name, job_id, salary, department_name, grade
 FROM employees a, departments b, Job_grades
 WHERE a.department_id = b.department_id AND salary BETWEEN MIN_SALARY AND MAX_SALARY; 
-
-
-SELECT EMPLOYEES.FIRST_NAME, EMPLOYEES.LAST_NAME, EMPLOYEES.JOB_ID, DEPARTMENTS.DEPARTMENT_NAME, EMPLOYEES.SALARY, JOB_GRADES.GRADE 
-FROM EMPLOYEES
-JOIN DEPARTMENTS ON DEPARTMENTS.DEPARTMENT_ID=EMPLOYEES.DEPARTMENT_ID
-JOIN JOB_GRADES ON EMPLOYEES.SALARY BETWEEN  JOB_GRADES.MIN_SALARY AND JOB_GRADES.MAX_SALARY 
 
 
 CREATE VIEW zad_11 AS 
