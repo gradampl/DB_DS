@@ -227,8 +227,6 @@ END;
 
 
 
-
-
 -- e)
 -- Stworzyć wyzwalacz, który przy próbie zmiany max i min salary
 -- w tabeli jobs zostawia stare wartości.
@@ -249,3 +247,203 @@ BEGIN
     END IF;  
 END;
 
+
+
+--===================================================================================
+--===================================================================================
+
+
+-- Zadanie 3 (paczki)
+
+-- a)
+-- Składającą się ze stworzonych procedur i funkcji
+
+
+-- PACKAGE SPECIFICATION:
+
+CREATE OR REPLACE PACKAGE zad_3a AS 
+
+   -- PROCEDURES:
+
+   -- Adds a row to the JOBS table      
+   PROCEDURE addRow(j_id IN VARCHAR, j_title IN VARCHAR); 
+   
+   -- Removes a row from the JOBS table   
+   PROCEDURE delRow(j_id IN VARCHAR); 
+   
+   
+   -- FUNCTIONS:
+   
+   -- Takes the area code into braces
+   FUNCTION area_number(phonenumber VARCHAR)
+   RETURN VARCHAR;
+   
+   -- Extracts the birth date from PESEL
+   FUNCTION get_date(pesel VARCHAR)
+   RETURN VARCHAR;   
+  
+END zad_3a; 
+
+
+
+-- PACKAGE BODY:
+
+
+CREATE OR REPLACE PACKAGE BODY zad_3a AS 
+
+   PROCEDURE addRow(j_id IN VARCHAR, j_title IN VARCHAR) 
+   IS
+    ex EXCEPTION;
+   BEGIN 
+      INSERT INTO jobs (job_id,job_title,min_salary,max_salary) 
+         VALUES(j_id, j_title, NULL, NULL);
+		 DBMS_OUTPUT.put_line(j_id || ' ' || j_title || ' added to Jobs');
+	  EXCEPTION
+	    WHEN DUP_VAL_ON_INDEX THEN
+		 DBMS_OUTPUT.put_line('Job with this id already exists');
+		WHEN OTHERS THEN
+		 DBMS_OUTPUT.put_line('Error!');
+   END addRow; 
+   
+   
+   PROCEDURE delRow(j_id IN VARCHAR) 
+   IS
+    wiersz jobs%ROWTYPE;
+    ex EXCEPTION;
+   BEGIN
+      SELECT * INTO wiersz FROM jobs WHERE job_id = j_id;
+      DELETE FROM jobs WHERE job_id = j_id;
+	  
+	  EXCEPTION
+	    WHEN NO_DATA_FOUND THEN
+          dbms_output.put_line('There is nothing to delete!');
+        WHEN OTHERS THEN
+          DBMS_OUTPUT.put_line('Error!');
+   END delRow;
+
+ 
+   FUNCTION area_number(phonenumber VARCHAR) 
+     RETURN VARCHAR IS 
+	  BEGIN
+  	   RETURN '(' || SUBSTR(phonenumber, 1, 2) || ')' || SUBSTR(phonenumber, 3);
+   END area_number;
+   
+   FUNCTION get_date(pesel VARCHAR)
+     RETURN VARCHAR IS
+	  BEGIN
+        RETURN '19' || SUBSTR(pesel, 1, 2) || '-' || SUBSTR(pesel, 3, 2) || '-' || SUBSTR(pesel, 5, 2);
+   END get_date;
+   
+END zad_3a;
+
+
+---------------------------------------------------------------------------
+
+
+
+
+
+-- Zadanie 3 (paczki)
+
+-- b)
+-- Stworzyć paczkę z procedurami i funkcjami do obsługi tabeli REGIONS (CRUD),
+-- gdzie odczyt z różnymi parametrami
+
+
+-- PACKAGE SPECIFICATION:
+
+CREATE OR REPLACE PACKAGE zad_3b AS 
+
+   -- PROCEDURES:
+
+   -- Create   
+   PROCEDURE addRegion(r_id  REGIONS.region_id%type, 
+      r_name REGIONS.region_name%type); 
+   
+   -- Read   
+   PROCEDURE listRegion;
+   
+   -- Update   
+   PROCEDURE changeRegion (r_id REGIONS.region_id%type, nowa_nazwa IN VARCHAR );
+   
+   -- Delete   
+   PROCEDURE delRegion(r_name REGIONS.region_name%type);   
+  
+END zad_3b; 
+
+
+
+------------------------------------------------------------------
+
+
+
+-- PACKAGE BODY:
+
+
+CREATE OR REPLACE PACKAGE BODY zad_3b AS
+
+   -- Create
+   
+   PROCEDURE addRegion(r_id  REGIONS.region_id%type, 
+      r_name REGIONS.region_name%type) 
+   IS 
+   BEGIN 
+      INSERT INTO REGIONS(region_id,region_name) 
+         VALUES(r_id, r_name); 
+   END addRegion;     
+   
+   
+   
+   -- Read
+   
+   PROCEDURE listRegion IS 
+   CURSOR r_regions is 
+      SELECT region_name FROM REGIONS; 
+   TYPE r_list is TABLE OF REGIONS.region_name%type; 
+   name_list r_list := r_list(); 
+   counter integer :=0; 
+   BEGIN 
+      FOR n IN r_regions LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter) := n.region_name; 
+      dbms_output.put_line('Region(' ||counter|| ')'||name_list(counter)); 
+      END LOOP; 
+   END listRegion;
+   
+   
+  
+  
+   --Update
+   
+  PROCEDURE changeRegion (r_id REGIONS.region_id%type, nowa_nazwa IN VARCHAR )
+AS
+  counter NUMBER;  
+
+BEGIN
+  SELECT count(*) into counter
+    FROM REGIONS
+   WHERE region_id = r_id; 
+
+  IF counter = 1 THEN
+    update REGIONS
+       set region_name = nowa_nazwa
+     where region_id = r_id;
+    dbms_output.put_line('Region name has been changed.');
+  ELSE
+    dbms_output.put_line('Region does not exist.');
+  END IF;
+END;
+   
+   
+   
+   -- Delete
+   
+   PROCEDURE delRegion(r_name REGIONS.region_name%type) 
+   IS 
+   BEGIN 
+      DELETE FROM REGIONS 
+      WHERE region_name = r_name; 
+   END delRegion;
+   
+END zad_3b;
