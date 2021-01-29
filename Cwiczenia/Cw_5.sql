@@ -94,21 +94,37 @@ empl_num NUMBER;
 BEGIN 
 SELECT COUNT(*) AS num_of_depts INTO depart_num 
 FROM departments 
-WHERE location_id IN (SELECT l.location_id FROM locations l WHERE l.country_id = select_country);
+WHERE location_id IN 
+ (SELECT l.location_id 
+  FROM locations l 
+  WHERE l.country_id IN 
+   (SELECT country_id 
+    FROM Countries 
+    WHERE country_name = select_country
+   )
+  );
 
 SELECT COUNT(*) AS num_of_empls INTO empl_num
 FROM employees 
-WHERE department_id 
-IN (SELECT department_id
-FROM departments 
-WHERE location_id 
-IN (SELECT l.location_id FROM locations l WHERE l.country_id = select_country));
+WHERE department_id IN 
+ (SELECT department_id
+  FROM departments 
+  WHERE location_id IN 
+   (SELECT l.location_id 
+    FROM locations l 
+	WHERE l.country_id IN 
+     (SELECT country_id 
+      FROM Countries 
+      WHERE country_name = select_country
+     )
+    )
+  );
+  
 RETURN depart_num || ' ' || empl_num;
 EXCEPTION 
 WHEN NO_DATA_FOUND THEN
 RETURN 'No data found!';
 END zad_1f;
-
 
 
 
