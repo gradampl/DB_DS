@@ -68,6 +68,10 @@ ALTER TABLE job_history
 ADD FOREIGN KEY (job_id) REFERENCES jobs(job_id);
 
 
+-- Z tabeli employees wypisz w jednej kolumnie nazwisko i zarobki – 
+-- nazwij kolumnę wynagrodzenie, dla osób z departamentów 20 i 50
+-- z zarobkami pomiędzy 2000 a 7000, uporządkuj kolumny według nazwiska
+
 CREATE VIEW zad_1 AS 
 SELECT department_id, last_name||' '||salary AS remuneration 
 FROM employees 
@@ -76,6 +80,12 @@ AND salary BETWEEN 2000 AND 7000
 ORDER BY department_id, last_name;
 
 
+
+-- Z tabeli employees wyciągnąć informację data zatrudnienia,
+-- nazwisko oraz kolumnę podaną przez użytkownika dla osób
+-- mających menadżera zatrudnionych w roku 2005. Uporządkować
+-- według kolumny podanej przez użytkownika
+
 CREATE VIEW zad_2 AS 
 SELECT last_name, hire_date, &X as user_column
 FROM employees
@@ -83,12 +93,26 @@ WHERE manager_id IS NOT NULL AND hire_date BETWEEN '05/01/01' AND '05/12/31'
 ORDER BY user_column;
 
 
+
+-- Wypisać imiona i nazwiska  razem, zarobki oraz numer telefonu porządkując
+-- dane według pierwszej kolumny malejąco  a następnie drugiej rosnąco 
+--(użyć numerów do porządkowania) dla osób z trzecią literą nazwiska ‘e’ 
+-- oraz częścią imienia podaną przez użytkownika
+
 CREATE VIEW zad_3 AS
 SELECT last_name||' '||first_name AS employee, salary, phone_number
 FROM employees
 WHERE last_name LIKE '__e%' AND first_name LIKE '%' || '&czesc_imienia' || '%'
 ORDER BY 1 DESC, 2 ASC;
 
+
+
+-- Wypisać imię i nazwisko, liczbę miesięcy przepracowanych – funkcje months_between
+-- oraz round oraz kolumnę wysokość_dodatku jako (użyć CASE lub DECODE):
+-- 10% wynagrodzenia dla liczby miesięcy do 150
+-- 20% wynagrodzenia dla liczby miesięcy od 150 do 200
+-- 30% wynagrodzenia dla liczby miesięcy od 200
+-- uporządkować według liczby miesięcy
 
 CREATE VIEW zad_4 AS
 SELECT first_name, last_name, salary,
@@ -107,6 +131,11 @@ END AS Bonus
 FROM zad_4;
 
 
+
+-- Dla każdego działów w których minimalna płaca jest wyższa niż 5000
+-- wypisz sumę oraz średnią zarobków zaokrągloną do całości
+-- nazwij odpowiednio kolumny
+
 CREATE VIEW zad_5 AS 
 SELECT department_id, MIN(salary) AS min_salary, 
 SUM(salary) AS sum_salary, ROUND(AVG(salary),0) AS avg_salary
@@ -115,12 +144,20 @@ GROUP BY department_id
 HAVING MIN(salary) > 5000;
 
 
+
+-- Wypisać nazwisko, numer departamentu, nazwę departamentu,
+-- id pracy, dla osób z pracujących Toronto
+
 CREATE VIEW zad_6 AS 
 SELECT a.last_name, a.department_id, b.department_name, a.job_id
 FROM employees a, departments b, locations c
 WHERE a.department_id = b.department_id 
 AND b.location_id = c.location_id AND city = 'Toronto';
 
+
+
+--Dla pracowników o imieniu „Jennifer” wypisz imię i nazwisko
+-- tego pracownika oraz osoby które z nim współpracują
 
 CREATE VIEW zad_7 AS 
 SELECT last_name, first_name, department_id
@@ -131,6 +168,9 @@ FROM employees
 WHERE first_name = 'Jennifer');
 
 
+
+-- Wypisać wszystkie departamenty w których nie ma pracowników
+
 CREATE VIEW zad_8 AS 
 SELECT *
 FROM departments
@@ -139,7 +179,7 @@ WHERE department_id IS NOT NULL);
 
 
 
--- ZADANIE 9
+-- Skopiuj tabelę Job_grades od użytkownika HR
 
 CREATE TABLE Job_grades  AS SELECT * FROM HR.Job_grades; 
 
@@ -147,6 +187,8 @@ SELECT * FROM Job_grades;
 
 
 
+-- Wypisz imię i nazwisko, id pracy, nazwę departamentu, zarobki, oraz
+-- odpowiedni grade dla każdego pracownika
 
 CREATE VIEW zad_10 AS  -- ta wersja działa
 SELECT last_name, first_name, job_id, salary, department_name, grade
@@ -154,12 +196,20 @@ FROM employees a, departments b, Job_grades
 WHERE a.department_id = b.department_id AND salary BETWEEN MIN_SALARY AND MAX_SALARY; 
 
 
+
+-- Wypisz imię nazwisko oraz zarobki dla osób które zarabiają
+-- więcej niż średnia wszystkich, uporządkuj malejąco według zarobków
+
 CREATE VIEW zad_11 AS 
 SELECT last_name, first_name, salary
 FROM employees
 WHERE salary > (SELECT AVG(salary) FROM employees)
 ORDER BY salary DESC;
 
+
+
+-- Wypisz id imie i nazwisko osób, które pracują w departamencie
+-- z osobami mającymi w nazwisku „u”
 
 CREATE VIEW zad_12 AS 
 SELECT last_name, first_name, department_id
@@ -172,10 +222,10 @@ WHERE last_name LIKE '%u%');
 
 ------------------------------------------------------------
 
---Dla każdego departamentu wypisać jego nazwę, 
---imię i nazwisko osoby, która ma w tym dziale 
---drugie zarobki pod względem wysokości 
---oraz wysokość tych zarobków
+-- Dla każdego departamentu wypisać jego nazwę, 
+-- imię i nazwisko osoby, która ma w tym dziale 
+-- drugie zarobki pod względem wysokości 
+-- oraz wysokość tych zarobków
 
 
 CREATE VIEW zad_13 AS

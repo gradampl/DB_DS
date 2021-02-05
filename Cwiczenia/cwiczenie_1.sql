@@ -68,10 +68,13 @@ CREATE TABLE Job_History (
 CREATE TABLE Jobs (
     job_id int NOT NULL,
 	job_title varchar(255),
-	min_salary float,
-    max_salary	float,
+	max_salary float,
+    min_salary	float,
+	CHECK(max_salary-min_salary>=2000),
+	
 	PRIMARY KEY (job_id)    	
 );
+
 
 ALTER TABLE Job_History
 ADD FOREIGN KEY (job_id) REFERENCES Jobs(job_id); 
